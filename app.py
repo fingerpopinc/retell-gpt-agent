@@ -1,3 +1,12 @@
+from flask import Flask, request, jsonify
+import openai
+import os
+import logging
+
+app = Flask(__name__)
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+logging.basicConfig(level=logging.INFO)
+
 @app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
 @app.route("/<path:path>", methods=["GET", "POST"])
 def chat(path):
@@ -31,3 +40,6 @@ def chat(path):
     except Exception as e:
         app.logger.error(f"💥 Error: {e}")
         return jsonify({"response": "Sorry, something broke on my end."}), 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
