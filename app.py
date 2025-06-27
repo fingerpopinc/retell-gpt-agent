@@ -13,33 +13,27 @@ def chat(path):
     if request.method == "GET":
         return jsonify({"response": "Voice agent is ready."})
 
-    if not request.is_json:
-        app.logger.warning("❌ Received non-JSON request.")
-        return jsonify({"response": "Invalid request: expecting JSON."}), 400
-
     try:
-        data = request.get_json()
-        app.logger.info("📥 Incoming JSON from Retell:")
-        app.logger.info(data)
+        # Handle raw text from Retell (not JSON)
+        raw_input = request.data.decode("utf-8").strip()
+        app.logger.info(f"🗣️ Retell raw input: {raw_input}")
 
-        messages = data.get("messages")
-        if not messages:
-            user_text = data.get("text") or data.get("utterance") or "Hi"
-            messages = [
-                {"role": "system", "content": "You are a helpful voice assistant."},
-                {"role": "user", "content": user_text}
-            ]
+        # Build OpenAI messages
+        messages = [
+            {"role": "system", "content": "You are a warm, natural-sounding voice assistant."},
+            {"role": "user", "content": raw_input or "Hi"}
+        ]
 
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=messages,
         )
-        reply = response.choices[0].message.content
+        reply = response.choices[0].message.content.strip()
         return jsonify({"response": reply})
 
     except Exception as e:
         app.logger.error(f"💥 Error: {e}")
-        return jsonify({"response": "Sorry, something broke on my end."}), 500
+        return jsonify({"response": "Something went wrong, but I'm still here!"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
