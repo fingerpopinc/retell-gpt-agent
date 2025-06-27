@@ -14,17 +14,18 @@ def chat(path):
         return jsonify({"response": "Voice agent is ready."})
 
     try:
-        # Handle raw text from Retell (not JSON)
+        # Read raw body text from Retell
         raw_input = request.data.decode("utf-8").strip()
         app.logger.info(f"🗣️ Retell raw input: {raw_input}")
 
-        # Build OpenAI messages
         messages = [
             {"role": "system", "content": "You are a warm, natural-sounding voice assistant."},
             {"role": "user", "content": raw_input or "Hi"}
         ]
 
-        response = openai.ChatCompletion.create(
+        # New OpenAI v1 client call
+        client = openai.OpenAI()
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=messages,
         )
