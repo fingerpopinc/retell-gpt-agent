@@ -26,7 +26,7 @@ def chat(path):
         # New OpenAI v1 client call
         client = openai.OpenAI()
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4-turbo",
             messages=messages,
         )
         reply = response.choices[0].message.content.strip()
